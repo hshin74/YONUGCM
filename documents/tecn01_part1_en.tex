@@ -1,0 +1,1282 @@
+\documentclass[12pt,openany]{book}
+
+\usepackage{amsmath}        % for \boldsymbol, equation environments
+\usepackage{geometry}
+\geometry{a4paper,margin=25mm}
+
+\begin{document}
+
+\begin{verbatim}
+
+FUNDAMENTAL FRAMEWORK AND DYNAMICS OF YONU AGCM
+
+Contents
+
+Part I Continuous Model 
+
+ 1. Fundamental Principles
+ 2. Hydrostatic Balance
+  2.1. Nonhydrostatic Processes
+  2.2. Pressure Coordinate System
+ 3. Primitive Equation Model
+  3.1. Four Subdomains of the Sigma Space
+  3.2. Interface Conditions and Boundary Conditions
+  3.3. Continuity Equation and Hydrostatic Equation
+ 4. Coupling of the PBL and the GCM
+  4.1. Randall’s Prognostic Equation for the PBL Depth
+  4.2. Surface Pressure Tendency Equation
+  4.3. PBL Top Pressure Tendency Equation
+ 5. Vertical Mass Flux
+  5.1. Middle Atmosphere: Mesosphere and Stratosphere
+  5.2. Troposphere
+  5.3. PBL
+  5.4. Continuity
+ 6. Dynamics
+  6.1. Conservation of Momentum / Horizontal Momentum Equation
+  6.2. Conservation of Energy / Thermodynamic Energy Equation
+  6.3. Conservation of Water /
+       Water Vapor Equation, Cloud Water Equation,
+       Precipitation Velocity Equation
+ 7. Diagnosis and Prognosis of State Variables
+ 8. Ensemble Mean and Perturbations of the State Population
+  8.1. Ensemble Mean
+  8.2. Uncorrelated Condition and Sample Occurrence Probability
+  8.3. Transport of the Mean
+  8.4. The GCM World and the Governing Equation System
+
+Part II Discrete Model 
+
+ 9. Vertical Discretization
+  9.1. Difference Equation System
+  9.2. Pressure Torque
+  9.3. Energy Conversion
+  9.4. Conservation of Kinetic Energy
+  9.5. Conservation of Potential Temperature
+  9.6. Entropy
+  9.7. Geopotential and Interface Temperature
+ 10. Horizontal Discretization
+  10.1. Continuity Equation
+  10.2. Horizontal Momentum Equation
+  10.3. Thermodynamic Energy Equation
+  10.4. Water Vapor Equation
+ 11. Polar Treatment I. Singular Point Treatment
+  11.1. Introduction
+  11.2. Surface Pressure Tendency and Vertical Mass Flux
+        at the Polar Grid
+  11.3. Momentum Equation around the Poles
+  11.4. Polar Wind
+ 12. Polar Treatment II. AVRX Operation
+  12.1. One-Dimensional Shallow-Water Model of Lamb Waves
+  12.2. AVRX in the Shallow-Water Model
+  12.3. AVRX and Energy Conservation in
+        the Primitive Equation Model
+  12.4. Latitudes Where AVRX Is Required
+  12.5. Note
+ 13. Time Discretization
+  13.1. Time Step of Dynamical Processes
+  13.2. Construction of the Adiabatic Marching
+ 14. Subgrid-Scale Processes
+  14.1. Resolution of the Discrete Model
+        and Parameterization Processes
+  14.2. Superparameterization
+
+References
+
+Note:
+Equation numbers are given as serial numbers such as (1), (2), and so forth 
+within each section. Equation (2) in Section 2.2 is cited as (2) 
+when referenced within that chapter, and as (2.2.2) when referenced in
+another chapter.
+
+\end{verbatim}
+
+\newpage
+
+Part I Continuous Model
+
+\chapter{Fundamental Principles}
+
+The continuous model of the atmospheric general circulation follows
+the fundamental principles of atmospheric dynamics. These principles
+refer to the conservation of mass, momentum, and energy of a dry air
+parcel assumed to be an ideal gas, as well as the conservation of
+water.
+
+In the atmosphere, water exists in three forms: water vapor, cloud
+water, and precipitation. Water vapor and cloud water move together
+with the dry air parcel and are regarded as properties of that parcel,
+whereas precipitation leaves the dry air parcel where it is generated
+and is water not associated with any dry parcel. We treat the
+conservation of these three forms of water separately.
+
+(1) Conservation of mass:
+
+For the density of a dry air parcel $\rho$ moving with the three-dimensional
+velocity $\vec{u}$,
+
+Continuity equation:
+\begin{equation}
+\frac{\partial \rho}{\partial t}
++ \vec{\nabla} \cdot ( \rho \vec{u} )
+= 0
+\tag{1.1}
+\label{eq:1.1}
+\end{equation}
+
+(2) Conservation of momentum:
+
+For the momentum per unit mass $\vec{u}$ of a dry air parcel subjected to the
+Coriolis force, pressure gradient force, and gravity,
+
+Momentum equation:
+\begin{equation}
+\rho \, \frac{d \vec{u}}{dt}
+= - 2 \, \vec{\Omega} \times \rho \vec{u}
+  - \vec{\nabla} p
+  - \rho \, \vec{\nabla} \Phi
+\tag{1.2}
+\label{eq:1.2}
+\end{equation}
+
+(3) Conservation of energy:
+
+For the temperature $T$ of a dry air parcel altered by adiabatic
+expansion, radiative heating, condensation of water vapor, evaporation
+of cloud water, evaporation of falling precipitation, and frictional
+heating,
+
+Thermodynamic energy equation:
+\begin{equation}
+C_v \,\rho \,\frac{dT}{dt}
+= -\, p \,\vec{\nabla} \cdot \vec{u}
+  + \rho \, Q_R
+  + L \,\rho \,( c - e - e_P )
+\tag{1.3}
+\label{eq:1.3}
+\end{equation}
+
+(4) Ideal gas:
+
+For pressure $p$, density $\rho$, and temperature $T$,
+
+Equation of state:
+\begin{equation}
+p = \rho \, R \, T
+\tag{1.4}
+\label{eq:1.4}
+\end{equation}
+
+(5) Conservation of water:
+
+For the water vapor mixing ratio $q$ and the cloud water mixing ratio
+$m$ of dry air, and for the (vertical) falling precipitation flux $F_P \ge 0$,
+
+Water vapor equation:
+\begin{equation}
+\rho \,\frac{dq}{dt}
+= -\, \rho \,( c - e - e_P )
+\tag{1.5}
+\label{eq:1.5}
+\end{equation}
+
+Cloud water equation:
+\begin{equation}
+\rho \,\frac{dm}{dt}
+= \rho \,( c - e - P )
+\tag{1.6}
+\label{eq:1.6}
+\end{equation}
+
+Precipitation flux equation:
+\begin{equation}
+\frac{\partial F_P}{\partial z}
+= -\, \rho \, ( P - e_P )
+\tag{1.7}
+\label{eq:1.7}
+\end{equation}
+
+Here, $t$ denotes time, $\vec{\nabla}$ denotes the three-dimensional
+gradient operator, and $z$ denotes the vertical coordinate.
+
+\begin{equation}
+\frac{d}{dt}
+= \frac{\partial}{\partial t}
+  + \vec{u} \cdot \vec{\nabla}
+\tag{1.8}
+\label{eq:1.8}
+\end{equation}
+
+And
+$\rho \, ; \vec{u} \, ; T \, ; p \, ; q \, ; m \, ; F_P$
+are the seven state variables of the atmospheric general circulation
+system represented by (1)--(7).
+Here, $\vec{\Omega}$ is the angular velocity of the Earth’s rotation;
+$\Phi$ is the gravitational potential or geopotential;
+$C_v$ is the specific heat at constant volume;
+$L$ is the latent heat of vaporization or sublimation;
+$R$ is the specific gas constant prescribed for the system;
+$\boldsymbol{\tau}$ is the stress tensor;
+$D$ is the frictional heating rate;
+$Q_R$ is the radiative heating rate;
+$c$ is the condensation rate of water vapor;
+$e$ is the evaporation rate of cloud water;
+$P$ is the precipitation production rate;
+and $e_P$ is the evaporation rate of falling precipitation.
+These represent processes that will be parameterized for the system.
+
+Parameterization of a process means computing that process from the
+state variables at a given point in space and time. 
+Therefore, parameterization is required to make
+(1)--(7) a closed system of equations.
+
+\chapter{Hydrostatic Balance}
+
+\section{Nonhydrostatic Processes}
+
+Gravity defines the vertical direction. An imbalance between gravity
+and the vertical pressure gradient force produces vertical
+acceleration. However, in large-scale motion systems, the
+representative magnitude of the vertical acceleration is $1\,\mathrm{cm}\,\mathrm{s}^{-1} \,/\, 1\,\mathrm{day}
+= 10^{-7}\,\mathrm{m}\,\mathrm{s}^{-2}$ 
+on the order of $10^{-8}$ times that of gravity $\simeq \ 9.81\,\mathrm{m}\,\mathrm{s}^{-2}$. Attempting to understand the
+vertical acceleration as resulting from the imbalance between the
+pressure gradient force and gravity at this scale would be extremely
+reckless. At this scale, it is assumed that these two forces are in
+balance. This assumption is referred to as hydrostatic balance.
+
+As the horizontal scale decreases, the magnitude of the vertical
+acceleration increases. For example, in a mesoscale convective
+organization (MOC), the vertical acceleration can easily reach an
+order of magnitude of $10\,\mathrm{m}\,\mathrm{s}^{-1} \,/\, \mathrm{hr}
+\simeq 3 \times 10^{-3}\,\mathrm{m}\,\mathrm{s}^{-2}$, which is still only about
+$3 \times 10^{-4}$ of gravity. Even in this case, hydrostatic balance
+will hold to a considerable degree. However, in explaining the
+development of an MOC, a causal explanation of vertical acceleration
+phenomena is more important than recognition of hydrostatic balance.
+Here, we appear to be at a boundary point where we hesitate over
+whether to abandon adherence to hydrostatic balance. At smaller
+horizontal scales with active vertical motion, the hydrostatic
+assumption must be abandoned.
+
+\section{Pressure Coordinate System}
+
+The hydrostatic assumption replaces the vertical component of the
+momentum equation (1.2) with the hydrostatic equation
+
+\begin{equation}
+-\,\frac{\partial p}{\partial z}
+= \rho\,\frac{\partial \Phi}{\partial z}
+\equiv \rho g > 0
+\quad \text{ or } \quad
+\frac{\partial \Phi}{\partial p}
+= -\,\alpha
+\tag{2.1}
+\label{eq:2.1}
+\end{equation}
+
+and appropriately modifies its horizontal components.
+Here, $g$ is the gravitational acceleration.
+With this, $p$ decreases monotonically with altitude $z$, and at any
+time $p$ and $z$ have a one‑to‑one correspondence.
+Therefore, $p$ can be used as the vertical coordinate.
+
+(1) Conservation of mass:
+The continuity equation (1.1) is transformed into
+
+Continuity equation:
+\begin{equation}
+\vec{\nabla}_p \cdot \vec{V}
++ \frac{\partial \omega}{\partial p}
+= 0;
+\qquad
+\omega \equiv \frac{dp}{dt}
+\tag{2.2}
+\label{eq:2.2}
+\end{equation}
+
+Here, $\vec{\nabla}_p,$ is the isobaric‑gradient horizontal operator, and $\vec{V},$ is
+the horizontal velocity.
+In the pressure coordinate system, $\omega,$ behaves as the
+vertical velocity and is called the vertical pressure velocity.
+Equation (2) takes a diagnostic form because the volume element in the
+pressure coordinate system is independent of time.
+
+(2) Conservation of momentum:
+In the pressure coordinate system, momentum is expressed only by the
+horizontal components of the velocity.
+Since the time variation of the horizontal velocity has a vertical
+component, we remove it by $\left( A \right)_H,$ and take only the horizontal
+component, and the Coriolis force is modified to $-\,f\,\hat{k} \times \vec{V}$.
+Therefore,
+
+Equation of motion:
+\begin{equation}
+\left( \frac{d \vec{V}}{dt} \right)_H
+=
+-\,f\,\hat{k} \times \vec{V}
+-
+\vec{\nabla}_p \Phi
+\tag{2.3}
+\label{eq:2.3}
+\end{equation}
+
+Here, we use the differential relation
+
+\begin{equation*}
+0
+=
+\left( \frac{\partial p(x,z)}{\partial x} \right)_p
+\equiv
+\left( \frac{\partial p}{\partial x} \right)_z
++
+\frac{\partial p}{\partial z}
+\left( \frac{\partial z}{\partial x} \right)_p
+=
+\left( \frac{\partial p}{\partial x} \right)_z
+-
+\rho g
+\left( \frac{\partial z}{\partial x} \right)_p
+=
+\left( \frac{\partial p}{\partial x} \right)_z
+-
+\rho
+\left( \frac{\partial \Phi}{\partial x} \right)_p
+\end{equation*}
+
+to express the horizontal component of the pressure‑gradient force as
+
+\begin{equation*}
+\left( -\,\alpha \,\vec{\nabla} p \right)_H
+=
+-\,\vec{\nabla}_p \Phi .
+\end{equation*}
+
+Here, $\alpha \equiv 1/\rho$ is the specific volume,
+$f \equiv 2 \Omega \sin \phi$,
+and $\phi$ is latitude.
+
+(3) Conservation of energy:
+
+\begin{equation*}
+C_v \frac{dT}{dt}
++
+\frac{p}{\rho}
+\,\vec{\nabla} \cdot \vec{u}
+=
+C_v \frac{dT}{dt}
++
+p \frac{d\alpha}{dt}
+=
+( C_v + R ) \frac{dT}{dt}
+-
+\alpha \frac{dp}{dt} .
+\end{equation*}
+
+Using $C_p \equiv C_v + R$ and $\omega \equiv dp/dt$,
+the thermodynamic energy equation (1.3) becomes
+
+Thermodynamic energy equation:
+\begin{equation}
+C_p \frac{dT}{dt}
+=
+\alpha \,\omega
++
+Q_R
++
+L ( c - e - e_P )
+\tag{2.4}
+\label{eq:2.4}
+\end{equation}
+
+In the pressure coordinate system,
+adiabatic expansion appears as the first term on the right‑hand side of (4).
+
+(4) Ideal gas:
+In the equation of state (1.4), $\rho$ is replaced by $1/\alpha$.
+On an isobaric surface, isotherms are iso–specific‑volume lines.
+
+\begin{equation}
+\alpha = \frac{R T}{p}
+\tag{2.5}
+\label{eq:2.5}
+\end{equation}
+
+(5) Conservation of water:
+Equations (1.5), (1.6), and (1.7) are transferred unchanged to the
+pressure coordinate system.
+
+Water vapor equation:
+\begin{equation}
+\frac{d q}{d t}
+=
+-\, ( c - e - e_P )
+\tag{2.6}
+\label{eq:2.6}
+\end{equation}
+
+Cloud water equation:
+\begin{equation}
+\frac{d m}{d t}
+=
+c - e - P
+\tag{2.7}
+\label{eq:2.7}
+\end{equation}
+
+Precipitation flux equation:
+\begin{equation}
+g \, \frac{\partial F_P}{\partial p}
+=
+-\, ( P - e_P )
+\tag{2.8}
+\label{eq:2.8}
+\end{equation}
+
+Here, $p$ is pressure used as the vertical coordinate,
+and $\vec{\nabla}_p$ is the isobaric‑gradient horizontal operator.
+
+\begin{equation}
+\frac{d}{d t}
+\equiv
+\left( \frac{\partial}{\partial t} \right)_p
++
+\vec{V} \cdot \vec{\nabla}_p
++
+\omega \, \frac{\partial}{\partial p}
+\tag{2.9}
+\label{eq:2.9}
+\end{equation}
+
+And, $\alpha \,;\, \vec{V} \,;\, \omega \,;\, T \,;\, \Phi \,;\, q \,;\, m \,;\, F_P$
+are the eight state variables of the atmospheric general circulation
+system represented by (1)--(8).
+The reason that one more state variable appears is that the
+three‑dimensional momentum equation has been separated into the
+horizontal momentum equation and the hydrostatic equation.
+In this process, $\alpha \equiv 1/\rho$ replaces $\rho$,
+and $\Phi$ replaces $p$, respectively.
+
+In particular, in the height coordinate system the gravitational
+geopotential $\Phi$ was prescribed independently of time as a function
+of $x, y, z$,
+but in the pressure coordinate system the geopotential $\Phi$ must be
+calculated as a function of $x, y, p, t$ depending on time.
+
+\chapter{Primitive Equation Model}
+
+The primitive equation system often refers to the basic equations
+written in the pressure coordinate system, but here we refer to the
+basic equations that will be written in the sigma coordinate system
+to be introduced in more detail later.
+
+\section{Four Subdomains of the Sigma Space}
+
+In order to take the model lower boundary as a coordinate surface,
+we change the vertical coordinate from $p$ to $\sigma$.
+To this end, we divide the entire vertical extent of the model
+atmosphere into four subdomains specified in the sigma space and
+define the pressure thickness $\pi$ for each subdomain.
+These subdomains, from bottom to top, are the PBL,
+the troposphere (excluding the PBL),
+the stratosphere, and the mesosphere.
+The mesosphere and the stratosphere constitute the middle atmosphere,
+the middle atmosphere and the troposphere constitute the free
+atmosphere, and the free atmosphere and the PBL constitute the
+homosphere.
+
+The upper boundary of the mesosphere, that is, the model top, is
+defined as the isobaric surface with pressure
+$p_T \equiv 0.01\,\mathrm{hPa}$,
+the upper boundary of the stratosphere is the isobaric surface with
+pressure
+$p_{ST} \equiv 1\,\mathrm{hPa}$,
+and the upper boundary of the troposphere is the isobaric surface
+with pressure
+$p_I \equiv 100\,\mathrm{hPa}$,
+respectively.
+
+However, the PBL top, which is the upper boundary of the turbulent
+layer and on which the subgrid bottoms of penetrating convective
+clouds are located, and the surface are not isobaric surfaces.
+The PBL‑top pressure $p_B(x,y,t)$ and the surface pressure
+$p_S(x,y,t)$ are prognosed as state variables of the model.
+Therefore, the pressure thickness of the mesosphere and that of the
+stratosphere are constants,
+
+\begin{equation*}
+\pi_M \equiv p_{ST} - p_T = 0.99\,\mathrm{mb},
+\qquad
+\pi_S \equiv p_I - p_{ST} = 99\,\mathrm{mb},
+\end{equation*}
+
+while the pressure thickness of the troposphere and that of the PBL
+are prognosed as variables,
+
+\begin{equation*}
+\pi_T \equiv p_B - p_I,
+\qquad
+\pi_{PBL} \equiv p_S - p_B,
+\end{equation*}
+
+as variables.
+
+The vertical coordinate $\sigma$ is generally an increasing function of
+$p$, but it is defined by subdomain so that
+$\sigma = -2$ at the top of the mesosphere,
+$\sigma = -1$ at the top of the stratosphere,
+$\sigma = 0$ at the top of the troposphere,
+$\sigma = 1$ at the top of the PBL,
+and $\sigma = 2$ at the surface.
+Accordingly, it is defined as follows in each subdomain:
+
+\begin{equation}
+\text{Mesosphere } \quad
+p_T \le p \le p_{ST},
+\qquad
+\sigma \equiv \frac{p - p_{ST}}{\pi_M} - 1
+\tag{3.1a}
+\label{3.1a}
+\end{equation}
+
+\begin{equation}
+\text{Stratosphere } \quad
+p_{ST} \le p \le p_I,
+\qquad
+\sigma \equiv \frac{p - p_I}{\pi_S}
+\tag{3.1b}
+\label{3.1b}
+\end{equation}
+
+\begin{equation}
+\text{Troposphere } \quad
+p_I \le p \le p_B,
+\qquad
+\sigma \equiv \frac{p - p_I}{\pi_T}
+\tag{3.1c}
+\label{3.1c}
+\end{equation}
+
+\begin{equation}
+\text{PBL } \quad
+p_B \le p \le p_S,
+\qquad
+\sigma \equiv \frac{p - p_B}{\pi_{PBL}} + 1
+\tag{3.1d}
+\label{3.1d}
+\end{equation}
+
+As defined above, the pressure and the vertical pressure velocity
+within each subdomain are expressed as follows.
+
+\bigskip
+
+In the mesosphere ($-2 < \sigma < -1$),
+\begin{equation}
+p = (\sigma + 1)\pi_M + p_{ST};
+\qquad
+\omega = \pi_M \dot{\sigma}
+\tag{3.2a}
+\label{3.2a}
+\end{equation}
+
+In the stratosphere ($-1 < \sigma < 0$),
+\begin{equation}
+p = \sigma \pi_S + p_I;
+\qquad
+\omega = \pi_S \dot{\sigma}
+\tag{3.2b}
+\label{3.2b}
+\end{equation}
+
+In the troposphere ($0 < \sigma < 1$),
+\begin{equation}
+p = \sigma \pi_T + p_I;
+\qquad
+\omega =
+\pi_T \dot{\sigma}
++
+\left(
+\frac{\partial}{\partial t}
++
+\vec{V} \cdot \vec{\nabla}
+\right)_{\sigma}
+\sigma p_B
+\tag{3.2c}
+\label{3.2c}
+\end{equation}
+
+In the PBL ($1 < \sigma < 2$),
+\begin{equation}
+p = (\sigma - 1)\pi_{PBL} + p_B;
+\qquad
+\omega =
+\pi_{PBL} \dot{\sigma}
++
+\left(
+\frac{\partial}{\partial t}
++
+\vec{V} \cdot \vec{\nabla}
+\right)_{\sigma}
+\bigl[(\sigma - 1)\pi_{PBL} + p_B\bigr]
+\tag{3.2d}
+\label{3.2d}
+\end{equation}
+
+As expressed above, although equation (2) was written by subdomain,
+the invariant form of $\omega$ with respect to subdomain is
+
+\begin{equation}
+\omega =
+\pi \dot{\sigma}
++
+\left(
+\frac{\partial}{\partial t}
++
+\vec{V} \cdot \vec{\nabla}
+\right)_{\sigma}
+p
+\tag{3.3}
+\label{3.3}
+\end{equation}
+
+\section{Interface Conditions and Boundary Conditions}
+
+At the interface between two adjacent subdomains, if $\Delta$ denotes a
+discontinuity, then from (3) it is easily obtained that
+\begin{equation}
+\Delta \bigl( \pi \dot{\sigma} \bigr)
+=
+\Delta \left(
+\omega - \vec{V} \cdot \vec{\nabla}_{\sigma} p
+\right)
+\tag{3.4}
+\label{3.4}
+\end{equation}
+
+Note that in the middle atmosphere,
+$\vec{\nabla}_{\sigma} p = 0$.
+Equation (4) is a constraint condition that must be satisfied at the
+interface between subdomains according to the subdomain‑dependent
+definitions of $\pi$ and $\sigma$.
+Now, at the interface between two adjacent subdomains, as an interface
+condition,
+
+\begin{equation}
+\Delta \bigl( \pi \dot{\sigma} \bigr) = 0
+\tag{3.5}
+\label{3.5}
+\end{equation}
+
+is imposed.
+This implies that even if the interface is a point of discontinuity
+of $\pi$ and $\dot{\sigma}$ individually, the product $\pi \dot{\sigma}$
+must be defined there.
+On the other hand, at the model top ($\sigma = -2$) and the bottom
+($\sigma = 2$), respectively, as a boundary condition,
+
+\begin{equation}
+\pi \dot{\sigma} = 0
+\tag{3.6}
+\label{3.6}
+\end{equation}
+
+is imposed.
+
+\section{Continuity Equation and Hydrostatic Equation}
+
+Now consider the transformation relations of invariant forms between the
+$p$ coordinate and the $\sigma$ coordinate.
+Using
+
+\begin{equation}
+\vec{\nabla}_{\sigma}
+=
+\vec{\nabla}_{p}
++
+\vec{\nabla}_{\sigma} p \,
+\frac{\partial}{\partial p};
+\qquad
+\partial p = \pi \, \partial \sigma ,
+\tag{3.7}
+\label{3.7}
+\end{equation}
+
+equation (2.2) is transformed within each subdomain into
+
+\begin{equation}
+\frac{\partial \pi}{\partial t}
++
+\vec{\nabla} \cdot \pi \vec{V}
++
+\frac{\partial}{\partial \sigma}
+\,
+\pi \dot{\sigma}
+=
+0 .
+\tag{3.8}
+\label{3.8}
+\end{equation}
+
+As in equation (3), equation (8) is invariant with respect to the
+subdomain.
+
+The hydrostatic equation (2.1),
+$\partial \Phi / \partial p = - \alpha$,
+is transformed according to $\partial p = \pi \partial \sigma$,
+within each subdomain, into
+
+\begin{equation}
+\frac{\partial \Phi}{\partial \sigma}
+=
+- \pi \alpha .
+\tag{3.9}
+\label{3.9}
+\end{equation}
+
+Equation (9) is also invariant with respect to the subdomain.
+
+Equations (8) and (9) will not be defined at the interface between two
+adjacent subdomains.
+
+\chapter{Coupling of the PBL and the GCM}
+
+\section{Randall's diagnostic equation for PBL depth}
+
+Over the ocean, the top of the PBL is close to a pressure surface. However, the PBL is assumed to be a turbulent layer adjacent to the surface, covering the Earth at every surface point. Therefore, over high mountains the PBL top is often no more than a few hundred meters higher than its surroundings. As discussed earlier, we have chosen the $\sigma$ coordinate system such that the PBL top is represented by a coordinate surface $\sigma = 1$.
+
+Over a sufficiently large area, the bases of penetrative cumulus clouds are all located at a single PBL top, whereas the cloud bases themselves represent regions where the PBL top is locally disrupted. The area between clouds where compensating subsidence occurs is much larger than the cloud-base area. At the grid scale, the cloud-base area in which upward mass flux occurs is negligible compared to the grid area.
+
+In contrast, turbulent entrainment occurs much more intermittently than the upward mass flux at cloud base. This entrainment corresponds to intense downward mass flux occurring where the PBL top is locally depressed. The area occupied by the induced rebound region between entrainment events is much larger than the area occupied by entrainment itself. At the grid scale, the area of entrainment-associated downward mass flux is likewise negligible compared to the grid area.
+
+As grid-point properties, the upward mass flux at cloud base, denoted by $M_B$, lifts the PBL-top pressure through subsidence, while the turbulent entrainment downward mass flux, defined as $E$, lowers the PBL-top pressure through rebound. Both $M_B$ and $E$ are defined per unit grid area.
+
+In general, the PBL-top pressure $p_B$ may vary in time due to four processes:
+(1) grid-scale horizontal advection, $-\vec{V}_B \cdot \nabla p_B$;
+(2) grid-scale vertical motion $\omega_B$ (pressure velocity);
+(3) compensating subsidence $g M_B$ induced around penetrative clouds; and
+(4) turbulent entrainment $-g E$
+(Arakawa and Mintz with collaborators 1974; Randall 1976).
+
+\begin{equation}
+\frac{\partial p_B}{\partial t}
+=
+\omega_B
+-
+\vec{V}_B \cdot \nabla p_B
++
+g (M_B - E)
+\tag{4.1}\label{eq:4.1}
+\end{equation}
+
+Here, $\omega_B$ is the vertical pressure velocity at the PBL top
+(upward motion, $\omega_B < 0$, tends to reduce the PBL-top pressure),
+$\vec{V}_B$ is the horizontal velocity at the top,
+$M_B$ is the cloud-base mass flux, representing subsidence induced compensationally around penetrative convection (subsidence tends to increase the PBL-top pressure),
+and $E$ is turbulent entrainment, the process by which free-atmospheric air with higher buoyancy is incorporated into the PBL.
+
+Within the convection scheme, the vertical pressure velocity is given by (3.2c) as
+\begin{equation}
+\omega
+=
+\pi \dot{\sigma}
++
+\sigma
+\left(
+\frac{\partial p_B}{\partial t}
++
+\vec{V} \cdot \nabla p_B
+\right)
+\tag{4.2}\label{eq:4.2}
+\end{equation}
+
+Approaching the PBL top ($\sigma = 1$) from above, (2) becomes
+\begin{equation}
+\omega_{B+}
+=
+(\pi \dot{\sigma})_{\sigma=1}
++
+\frac{\partial p_B}{\partial t}
++
+\vec{V}_{B+} \cdot \nabla p_B .
+\tag{4.3}\label{eq:4.3}
+\end{equation}
+
+Within the PBL, the vertical pressure velocity is given by (3.2d) as
+\begin{equation}
+\omega
+=
+\frac{\partial p_B}{\partial t}
++
+\vec{V} \cdot \nabla p_B
++
+\pi \dot{\sigma}
++
+(\sigma - 1)
+\left[
+\frac{\partial}{\partial t}(p_S - p_B)
++
+\vec{V} \cdot \nabla (p_S - p_B)
+\right] .
+\tag{4.4}\label{eq:4.4}
+\end{equation}
+
+Approaching the PBL top ($\sigma = 1$) from below, (4) becomes
+\begin{equation}
+\omega_{B-}
+=
+(\pi \dot{\sigma})_{\sigma=1}
++
+\frac{\partial p_B}{\partial t}
++
+\vec{V}_{B-} \cdot \nabla p_B .
+\tag{4.5}\label{eq:4.5}
+\end{equation}
+\\
+Subtracting (5) from (3), a jump condition at the PBL top is obtained:
+\begin{equation}
+\Delta\left(\omega - \vec{V} \cdot \nabla p_B \right)
+=
+0
+\tag{4.6}\label{eq:4.6}
+\end{equation}
+
+This condition is a necessary consequence of (3.5) and can also be derived directly from (3.4).
+At the PBL top, $\omega$ and $\vec{V}$ may each be discontinuous, but the particular combination
+$\omega - \vec{V} \cdot \nabla_{\sigma} p$
+cannot be discontinuous.
+Randall's equation (1) contains precisely this combination.
+In (1), this combination represents the contribution of grid-scale motion to local changes in the PBL-top pressure.
+From the viewpoint that $\omega_B$ and $\vec{V}_B$ may not be well defined at the PBL top,
+we rewrite (1) as
+\begin{equation}
+\frac{\partial p_B}{\partial t}
+=
+\left(
+\omega
+-
+\vec{V} \cdot \nabla_{\sigma} p
+\right)_B
++
+g (M_B - E) .
+\tag{4.7}\label{eq:4.7}
+\end{equation}
+
+\section{Surface Pressure Tendency Equation}
+
+Integrating (3.8) from the top of the atmosphere to the surface and using the interface condition (3.5) and the boundary condition (3.6), the surface pressure tendency equation is obtained as
+\begin{equation}
+\frac{\partial p_S}{\partial t}
+=
+- \vec{\nabla} \cdot \int_{-2}^{2} \vec{V}_{\pi} \, d\sigma .
+\tag{4.8}
+\label{eq:4.8}
+\end{equation}
+
+This result shows that, locally, the surface pressure tendency is predicted by the mass convergence over the entire atmospheric column. Equation (8) can be explicitly written as
+\[
+\int_{-2}^{2} \frac{\partial \pi}{\partial t} \, d\sigma
+=
+\int_{-2}^{-1} \frac{\partial}{\partial t}(p_{ST} - p_T)
++
+\int_{-1}^{0} \frac{\partial}{\partial t}(p_I - p_{ST}) \, d\sigma
+\]
+\[
+\quad
++
+\int_{0}^{1} \frac{\partial}{\partial t}(p_B - p_I) \, d\sigma
++
+\int_{1}^{2} \frac{\partial}{\partial t}(p_S - p_B) \, d\sigma
+=
+\frac{\partial p_S}{\partial t}
+\]
+
+\section{PBL-Top Pressure Tendency Equation}
+
+From the comparison of equations (3) and (7), or equivalently of (5) and (7), one obtains
+
+\begin{equation}
+(\pi \dot{\sigma})_{\sigma=1}
+=
+g\,(E - M_B).
+\tag{4.9}
+\label{eq:4.9}
+\end{equation}
+
+The interpretation of (9) is extremely important for understanding local pressure changes at the PBL top, that is, the motion of the PBL top in $p$-space.  
+The PBL top is a fixed coordinate surface in $\sigma$-space.  
+“Motion in $p$-space” of the PBL top relative to the $\sigma=1$ coordinate surface is caused by turbulent entrainment, which is a downward mass flux, and by the cloud-base mass flux, which is an upward mass flux.  
+The vertical mass flux at this coordinate surface is given by the difference of the two fluxes.  
+If $M_B = E = 0$, then $(\pi \dot{\sigma})_B = 0$.  
+Air parcels cannot cross the PBL top by any process other than these two fluxes.  
+In other words, the PBL top ($\sigma=1$) is a material surface with respect to grid-scale motion.
+
+Integrating the continuity equation (3.8) from the model top ($\sigma=-2$) to the PBL top ($\sigma=1$), or equivalently from the PBL top to the surface, and using (3.5) and (3.6), one obtains
+
+\begin{equation}
+(\pi \dot{\sigma})_{\sigma=1}
+=
+- \vec{\nabla} \cdot \int_{-2}^{1} \vec{V}_{\pi} \, d\sigma
+-
+\frac{\partial p_B}{\partial t}.
+\tag{4.10}
+\label{eq:4.10}
+\end{equation}
+
+Eliminating $(\pi \dot{\sigma})_{\sigma=1}$ using (9), equation (10) becomes
+
+\begin{equation}
+\frac{\partial p_B}{\partial t}
+=
+- \vec{\nabla} \cdot \int_{-2}^{1} \vec{V}_{\pi} \, d\sigma
++
+g\,(M_B - E).
+\tag{4.11}
+\label{eq:4.11}
+\end{equation}
+
+Equation (11) is more convenient for use than (7) because it does not require information on the horizontal advection or vertical pressure velocity at the PBL top.  
+Hereafter, (11) will be referred to as the “PBL-top pressure tendency equation.”  
+The cloud-base mass flux increases the PBL-top pressure through compensating subsidence, while turbulent entrainment decreases it through compensating rebound.  
+Grid-scale convergence (divergence) of free-atmospheric column mass increases (decreases) the PBL-top pressure.
+From the comparison of (7) and (11), one finds
+
+\begin{equation}
+\left(
+\omega
+-
+\vec{V} \cdot \vec{\nabla}_{\sigma} p
+\right)_B
+=
+- \vec{\nabla} \cdot \int_{-2}^{1} \vec{V}_{\pi} \, d\sigma
+\tag{4.12}
+\label{eq:4.12}
+\end{equation}
+
+In $\sigma$-space, where the PBL top is a coordinate surface, the effect of large-scale motion on the time change of PBL-top pressure is expressed by the vertically integrated mass convergence above that surface.  
+Equation (12) does not hold in a $\sigma$-space in which the PBL top is not a coordinate surface.
+
+\chapter{Vertical Mass Flux}
+
+\section{Middle Atmosphere: Stratosphere and Mesosphere}
+
+In the middle atmosphere ($-2 < \sigma < 0$), since
+$\partial \pi / \partial t = 0$,
+the integration of (3.8) from the model top to an arbitrary $\sigma < 0$ yields
+
+\begin{equation}
+\pi \dot{\sigma}
+=
+- \vec{\nabla} \cdot \int_{-2}^{\sigma} \vec{V}_{\pi} \, d\sigma .
+\tag{5.1}
+\label{eq:5.1}
+\end{equation}
+
+In particular, at the interface ($\sigma = 0$), (1) reduces to
+
+\begin{equation}
+(\pi \dot{\sigma})_{\sigma = 0}
+=
+- \vec{\nabla} \cdot \int_{-2}^{0} \vec{V}_{\pi} \, d\sigma .
+\tag{5.2}
+\label{eq:5.2}
+\end{equation}
+
+\section{Troposphere}
+
+In the troposphere ($0 < \sigma < 1$),
+$\partial \pi / \partial t = \partial p_B / \partial t$.
+Therefore, integrating (3.8) from $\sigma = 0$ to an arbitrary $\sigma < 1$ gives
+
+\begin{equation}
+\sigma \frac{\partial p_B}{\partial t}
++
+\vec{\nabla} \cdot \int_{0}^{\sigma} \vec{V}_{\pi} \, d\sigma
++
+\pi \dot{\sigma}
+-
+(\pi \dot{\sigma})_{0}
+=
+0 .
+\tag{5.3}
+\label{eq:5.3}
+\end{equation}
+
+Here, $(\pi \dot{\sigma})_{0}$ and $\partial p_B / \partial t$
+are given by (2) and (4.11), respectively.
+Therefore, (3) becomes
+
+\begin{equation}
+\pi \dot{\sigma}
+=
+\vec{\nabla} \cdot \int_{\sigma}^{1} \vec{V}_{\pi} \, d\sigma
+-
+(1 - \sigma)\,
+\vec{\nabla} \cdot \int_{-2}^{1} \vec{V}_{\pi} \, d\sigma
++
+\sigma g (E - M_B) .
+\tag{5.4}
+\label{eq:5.4}
+\end{equation}
+
+Equation (4) reduces to (2) at the interface, and to (4.9) at the PBL top
+($\sigma = 1$).
+
+\section{PBL}
+
+In the PBL ($1 < \sigma < 2$), since
+$\partial \pi / \partial t = \partial p_S / \partial t - \partial p_B / \partial t$,
+the integration of (3.8) from $\sigma = 1$ to an arbitrary $\sigma < 2$ yields
+
+\begin{equation}
+\left(
+\frac{\partial p_S}{\partial t}
+-
+\frac{\partial p_B}{\partial t}
+\right)
+(\sigma - 1)
++
+\vec{\nabla} \cdot \int_{1}^{\sigma} \vec{V}_{\pi} \, d\sigma
++
+\pi \dot{\sigma}
+-
+(\pi \dot{\sigma})_{\sigma=1}
+=
+0 .
+\tag{5.5}
+\label{eq:5.5}
+\end{equation}
+
+Here,
+$\partial p_S / \partial t$ and $\partial p_B / \partial t$
+are given by (4.8) and (4.11), respectively,
+and $(\pi \dot{\sigma})_{\sigma=1}$ is given by (4.9).
+Therefore, (5) becomes
+
+\begin{equation}
+\pi \dot{\sigma}
+=
+\vec{\nabla} \cdot \int_{\sigma}^{2} \vec{V}_{\pi} \, d\sigma
++
+(2 - \sigma)\,
+\vec{\nabla} \cdot \int_{1}^{2} \vec{V}_{\pi} \, d\sigma
++
+g (E - M_B) .
+\tag{5.6}
+\label{eq:5.6}
+\end{equation}
+
+Equation (6) reduces to (4.9) at the PBL top ($\sigma = 1$),
+and to (3.6) at the model bottom ($\sigma = 2$).
+
+\section{Continuity}
+
+The quantity $\pi \dot{\sigma}$ varies continuously with $\sigma$,
+from zero at the top boundary to zero at the lower boundary,
+and in particular equals $g(E - M_B)$ at $\sigma = 1$.
+This continuity is guaranteed at the interfaces between adjacent subdomains.
+Therefore, $\pi \dot{\sigma}$ is well defined at those interfaces as well.
+
+\chapter{Dynamics}
+
+\section{Conservation of Momentum / Horizontal Momentum Equation}
+
+\begin{equation}
+\pi \frac{d \vec{V}}{d t}
+=
+\frac{\partial}{\partial t} \, \pi \vec{V}
++
+\vec{\nabla}_{\sigma} \cdot \pi \vec{V} \vec{V}
++
+\frac{\partial}{\partial \sigma} \, \pi \dot{\sigma} \vec{V}
+=
+-
+f \, \hat{k} \times \pi \vec{V}
+-
+\pi \left(
+\vec{\nabla}_{\sigma} \Phi
++
+\alpha \, \vec{\nabla}_{\sigma} p
+\right)
+\tag{6.1}
+\label{eq:6.1}
+\end{equation}
+
+\section{Conservation of Energy / Thermodynamic Energy Equation}
+
+\begin{equation}
+\pi C_p \frac{d T}{d t}
+=
+C_p \left(
+\frac{\partial}{\partial t} \, \pi T
++
+\vec{\nabla}_{\sigma} \cdot \pi \vec{V} T
++
+\frac{\partial}{\partial \sigma} \, \pi \dot{\sigma} T
+\right)
+=
+\pi \alpha \omega
++
+\pi \left[
+Q_R
++
+L (c - e - e_P)
+\right]
+\tag{6.2}
+\label{eq:6.2}
+\end{equation}
+
+\section{Conservation of Water / Water Vapor Equation, Cloud Water Equation,
+and Precipitation Flux Equation}
+
+\begin{equation}
+\pi \frac{d q}{d t}
+=
+\frac{\partial}{\partial t} \, \pi q
++
+\vec{\nabla}_{\sigma} \cdot \pi \vec{V} q
++
+\frac{\partial}{\partial \sigma} \, \pi \dot{\sigma} q
+=
+-
+\pi (c - e - e_P)
+\tag{6.3}
+\label{eq:6.3}
+\end{equation}
+
+\begin{equation}
+\pi \frac{d m}{d t}
+=
+\frac{\partial}{\partial t} \, \pi m
++
+\vec{\nabla}_{\sigma} \cdot \pi \vec{V} m
++
+\frac{\partial}{\partial \sigma} \, \pi \dot{\sigma} m
+=
+\pi (c - e - P)
+\tag{6.4}
+\label{eq:6.4}
+\end{equation}
+
+\begin{equation}
+\text{Precipitation flux equation:}\qquad
+g \frac{\partial F_P}{\partial \sigma}
+=
+-
+\pi (P - e_P)
+\tag{6.5}
+\label{eq:6.5}
+\end{equation}
+
+The pressure $p$ appearing on the right-hand side of (1),
+the vertical pressure velocity $\omega$ appearing on the right-hand side of (2),
+and $\pi$ appearing in (1)--(5)
+must all be noted to be expressed differently in each subdomain,
+together with $p$.
+
+Middle Atmosphere ($-2 < \sigma < -1$):
+\[
+\pi_M = p_{ST} - p_T ,
+\qquad
+p = (\sigma + 1)\pi_M + p_{ST}
+\]
+\[
+\vec{\nabla}_{\sigma} p = 0
+\]
+\[
+\omega = \pi_M \dot{\sigma}
+\]
+
+Stratosphere ($-1 < \sigma < 0$):
+\[
+\pi_S = p_I - p_{ST},
+\qquad
+p = \sigma \pi_S + p_I
+\]
+\[
+\vec{\nabla}_{\sigma} p = 0
+\]
+\[
+\omega = \pi_S \dot{\sigma}
+\]
+
+Troposphere ($0 < \sigma < 1$):
+\[
+\pi_T = p_B - p_I,
+\qquad
+p = \sigma \pi_T + p_I
+\]
+\[
+\vec{\nabla}_{\sigma} p = \sigma \vec{\nabla}_{\sigma} p_B
+\]
+\[
+\omega
+=
+\pi_T \dot{\sigma}
++
+\sigma
+\left(
+\frac{\partial p_B}{\partial t}
++
+\vec{V} \cdot \vec{\nabla} p_B
+\right)
+\]
+
+PBL ($1 < \sigma < 2$):
+\[
+\pi_{PBL} = p_S - p_B ,
+\qquad
+p = (\sigma - 1)\pi_{PBL} + p_B
+= (\sigma - 1)p_S + (2 - \sigma)p_B
+\]
+\[
+\vec{\nabla}_{\sigma} p
+=
+(\sigma - 1)\vec{\nabla} p_S
++
+(2 - \sigma)\vec{\nabla} p_B
+\]
+\[
+\omega
+=
+\pi_{PBL} \dot{\sigma}
++
+(\sigma - 1)
+\left(
+\frac{\partial p_S}{\partial t}
++
+\vec{V} \cdot \vec{\nabla} p_S
+\right)
++
+(2 - \sigma)
+\left(
+\frac{\partial p_B}{\partial t}
++
+\vec{V} \cdot \vec{\nabla} p_B
+\right)
+\]
+
+Here,
+$\partial p_S / \partial t$ and $\partial p_B / \partial t$
+can be given by the right-hand sides of (4.8) and (4.11), respectively.
+
+\chapter{Diagnosis and Prognosis of State Variables}
+
+The state variables of the primitive-equation model consist of three
+diagnostic variables—geopotential height, vertical mass flux, and
+precipitation rate—and six prognostic variables—surface pressure,
+pressure at the top of the PBL, horizontal velocity, temperature,
+water vapor mixing ratio, and cloud water mixing ratio. Thus, there are
+nine state variables in total.
+
+The geopotential height is diagnosed from the hydrostatic equation, the
+vertical mass flux from the vertical mass-flux equation, and the
+precipitation rate from the precipitation equation. The surface
+pressure is prognosed from the surface-pressure tendency equation, the
+pressure at the top of the PBL from the PBL-top pressure tendency
+equation, the horizontal velocity from the horizontal momentum
+equation, the temperature from the thermodynamic energy equation, the
+water vapor mixing ratio from the water-vapor equation, and the cloud
+water mixing ratio from the cloud-water equation.
+
+
+\end{document}
